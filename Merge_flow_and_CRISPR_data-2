@@ -1,0 +1,15 @@
+library(data.table)
+library(dplyr)
+
+#load list of TFs altered in Brian's CRISPR screen
+gene.list <- fread("/Users/susannbruche/Documents/Transcription_factor_network-laminar_shear/edgeR_Untr6h_vs_Static_all_analysed_3.csv")
+
+#load list of TFs altered with 6h laminar flow - RNASeq
+TF.list <- fread("/Users/susannbruche/Documents/Transcription_factor_network-laminar_shear/pantherGeneList_transcriptional_regulators(411).csv", header=TRUE)
+
+Brian's CRISPR screen list has gene symbols with lower cases, RNASeq with all upper - expand CRISPR list with column gene symbol in all upper cases
+gene.list$gene_upper <- toupper(gene.list$Gene)
+
+B <- inner_join(TF.list, gene.list, by = c("GeneID" = "gene_upper")) # merge both tables on gene symbol
+
+fwrite(B, "TF_altered_6h_static_Klf2_CRISPR_GeneSymbol_matching.csv") # save file
