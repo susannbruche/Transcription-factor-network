@@ -1,0 +1,21 @@
+library(data.table)
+library(mygene)
+library(dplyr)
+
+gene.list <- fread("/Users/susannbruche/Documents/Transcription_factor_network-laminar_shear/genelist.txt")
+Ensembl <- queryMany(symbols, scopes = "symbol", fields = "ensembl.gene", species = "human") # output is a df
+write.table(Ensembl, 'Ensembl.txt')
+
+# Clean up file in Excel - Ensembl IDs are in sublists, separate multiple IDs in separate columns - resave
+
+Ensembl.list <- fread("/Users/susannbruche/Documents/Transcription_factor_network-laminar_shear/Ensembl.txt") # load cleaned file
+
+#load list of TF altered with 6h laminar flow
+TF.list <- fread("/Users/susannbruche/Documents/Transcription_factor_network-laminar_shear/pantherGeneList_transcriptional_regulators(411).txt", header=FALSE)
+
+#label TF.list columns
+colnames(TF.list) <- c('IDs', 'ensembl', 'name', 'family', 'class')
+
+A <- left_join(TF.list, Ensembl.list, by = "ensembl") # merge both tables on TF.list and by Ensembl ID
+
+fwrite(A, "TF_altered_6h_static_Klf2_CRISPR.csv") # save file
